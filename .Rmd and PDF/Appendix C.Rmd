@@ -1,0 +1,69 @@
+---
+title: "R Code for Calculating the Relative Importance of Each Component in a PD Observed Score"
+output: pdf_document
+author: Lara Stas
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First, read in the following function by running the following lines. 
+
+```{r, message = F}
+# function for calculating amount of relative variance (no need to modify)
+relvar <- function(c1, c2, c3, c4){
+  tot <- c1+c2+c3+c4
+  rv1 <- round(c1/tot*100,2)
+  rv2 <- round(c2/tot*100,2)
+  rv3 <- round(c3/tot*100,2)
+  rv4 <- round(c4/tot*100,2)
+  cat("% of variance explained by", deparse(substitute(c1)), " = ",rv1, 
+      "\n% of variance explained by", deparse(substitute(c2)), " = ",rv2, 
+      "\n% of variance explained by", deparse(substitute(c3)), " = ",rv3, 
+      "\n% of variance explained by", deparse(substitute(c4)), " = ",rv4)
+}
+```
+
+Now, this function can be used to calculate the relative importance of each PD SRM component in a purely dyadic (observed) score.
+First, specify the estimated variance of each component (you can find this in the lavaan output under the header "Variances")
+
+Legend: 
+\begin{itemize}
+  \item fam = family component
+  \item i =  individual component
+  \item d = dyadic component
+  \item roles: mo = mother; fa = father; oc = oldest child; yc = youngest child.
+\end{itemize}
+
+```{r, message = F}
+# Estimated variance of each component
+  fam <- 0.473
+  i.mo <- 0.129
+  i.fa <- 0.417
+  i.oc <- 0.099
+  i.yc <- 0
+  d.mofa <- 0.261
+  d.mooc <- 0.168
+  d.moyc <- 0.063
+  d.faoc <- 0.045
+  d.fayc <- 0.094
+  d.ycoc <- 0.473
+```
+
+Than, tell R by which components the PD scores are defined. For example, as can be seen in Figure 3 of the manuscript, the PD score of the mother-father dyad is a function of the family component, the individual component of the mother, the individual component of the father and the mother-father dyadic component.
+
+```{r, message = F}
+# mother-father PD score
+  relvar(c1 = fam, c2 = i.mo, c3 = i.fa, c4 = d.mofa)
+# mother-oldest child PD score
+  relvar(c1 = fam, c2 = i.mo, c3 = i.oc, c4 = d.mooc)
+# mother-youngest child PD score
+  relvar(c1 = fam, c2 = i.mo, c3 = i.yc, c4 = d.moyc)
+# father-oldest child PD score
+  relvar(c1 = fam, c2 = i.fa, c3 = i.oc, c4 = d.faoc)
+# father-youngest child PD score
+  relvar(c1 = fam, c2 = i.fa, c3 = i.yc, c4 = d.fayc)
+# youngest-oldest child PD score
+  relvar(c1 = fam, c2 = i.yc, c3 = i.oc, c4 = d.ycoc)
+```
